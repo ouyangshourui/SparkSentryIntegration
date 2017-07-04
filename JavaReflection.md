@@ -119,4 +119,37 @@ object SentryClientReflection {
 2、java reflection:http://www.journaldev.com/1789/java-reflection-example-tutorial#get-class-object
 
 
+
+# HiveExternalCatalog code
+
+```
+ /**
+    * A client used to interact with the sentry server
+    */
+  lazy val sentryClient = {
+    val url = new URL(client.getConf("hive.sentry.conf.url", ""))
+    val newAuthzConf = new HiveAuthzConf(url)
+    SentryServiceClientFactory.create(newAuthzConf)
+  }
+   override def listDatabases(): Seq[String] = withClient {
+   /* val result = ArrayBuffer[String]()
+    val tables = new HashMap[String, TSentryRole]
+    val user = UserGroupInformation.getCurrentUser().getShortUserName
+    val roles = sentryClient.listRoles(user)
+    val rolesIter = roles.iterator()
+    while(rolesIter.hasNext) {
+      val role = rolesIter.next()
+      val allPriIter = sentryClient.listAllPrivilegesByRoleName(user, role.getRoleName).iterator()
+      while(allPriIter.hasNext) {
+        val privilege = allPriIter.next()
+        tables(privilege.getDbName) = role
+        client.listDatabases(privilege.getDbName).foreach(x => result += x )
+      }
+
+    }
+    result.toSeq*/
+    client.listDatabases("*")
+  }
+
+```
  
