@@ -1,6 +1,6 @@
 
 
-# orgin code 
+# nomal code
  ```
  package com.wanda.sentry
 import org.apache.hadoop.security.UserGroupInformation
@@ -108,7 +108,7 @@ object SentryClientReflection {
        val stringClass = Class.forName("java.lang.String")
        val listUserRolesMethod = sentryClient.getClass.getMethod("listUserRoles",stringClass)
 
-        listUserRolesMethod.invoke(sentryClient,"wumei10")
+        listUserRolesMethod.invoke(sentryClient,"user")
 
      }
 }
