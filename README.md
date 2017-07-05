@@ -5,9 +5,10 @@ Book URL:https://www.gitbook.com/book/ouyangshourui/sparkwithsentryprivilege/det
 
 ## [Apache Spark](http://spark.apache.org)
 
-![Apache Spark](picture/spark-logo-trademark.png)
+<a href="http://spark.apache.org"><img src="spark-logo-trademark.png" align="left" height="100" width="100" ></a>
 
 ## [Apache Sentry](http://sentry.apache.org)
 
-![Apache Sentry](picture/sentry.png)
+<a href="http://sentry.apache.org"><img src="picture/sentry.png" align="left" height="100" width="100" ></a>
+
 
