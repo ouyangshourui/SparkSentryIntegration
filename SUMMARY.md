@@ -7,8 +7,8 @@
 
 
 
-![Apache Spark](picture/spark-logo-trademark.png)
-![Apache Sentry](picture/sentry.png)
+![Apache Spark](picture/spark-logo-trademark.png =200*200)
+![Apache Sentry](picture/sentry.png =200x200)
 
 
 
