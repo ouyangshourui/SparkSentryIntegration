@@ -7,7 +7,9 @@
 
 
 
-![Apache spark]: picture/spark-logo-trademark.png
+![Apache Spark](picture/spark-logo-trademark.png)
+![Apache Sentry](picture/sentry.png)
+
 
 
 
