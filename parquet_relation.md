@@ -122,3 +122,71 @@ GlobalLimit 10
 ## 2.2 OrcConversions 
 和ParquertConversions类似
 
+## 哪些hive存储格式会直接转换为fs relation？哪些hive存储格式不会转换?**
+Parquert 和ORC 为转换为普通文件 relation，其他的走hive metastore relation。
+下面我们测试一下 hive 存储格式为text的格式的analyzed logicplan
+```
+hive> show create table tmp.zsl_15to20;
+OK
+CREATE TABLE `zsl_15to20`(
+  `mobnum` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://nn-idc/user/hive/warehouse/tmp.db/zsl_15to20'
+TBLPROPERTIES (
+  'COLUMN_STATS_ACCURATE'='true', 
+  'numFiles'='1', 
+  'numRows'='25', 
+  'rawDataSize'='275', 
+  'totalSize'='285', 
+  'transient_lastDdlTime'='1499227424')
+Time taken: 0.068 seconds, Fetched: 17 row(s)
+```
+在spark shell 里面查看
+```
+val sqlContext = new org.apache.spark.sql.SQLContext(sc) 
+ import sqlContext._  
+sqlContext.sql("show databases")
+val sd =sqlContext.sql("show databases")
+sd.collect()
+val ss=sqlContext.sql("select * from tmp.zsl_15to20 limit 1")
+ ss.queryExecution.optimizedPlan
+ss.queryExecution.analyzed
+
+res3: org.apache.spark.sql.catalyst.plans.logical.LogicalPlan =
+GlobalLimit 1
++- LocalLimit 1
+   +- Project [mobnum#8]
+      +- MetastoreRelation tmp, zsl_15to20
+
+scala> ss.queryExecution
+== Parsed Logical Plan ==
+'GlobalLimit 1
++- 'LocalLimit 1
+   +- 'Project [*]
+      +- 'UnresolvedRelation `tmp`.`zsl_15to20`
+
+== Analyzed Logical Plan ==
+mobnum: string
+GlobalLimit 1
++- LocalLimit 1
+   +- Project [mobnum#8]
+      +- MetastoreRelation tmp, zsl_15to20
+
+== Optimized Logical Plan ==
+GlobalLimit 1
++- LocalLimit 1
+   +- MetastoreRelation tmp, zsl_15to20
+
+== Physical Plan ==
+CollectLimit 1
++- HiveTableScan [mobnum#8], MetastoreRelation tmp, zsl_15to20
+
+
+```
+
