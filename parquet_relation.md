@@ -122,7 +122,7 @@ GlobalLimit 10
 ## 2.2 OrcConversions 
 和ParquertConversions类似
 
-## 哪些hive存储格式会直接转换为fs relation？哪些hive存储格式不会转换?**
+# 3.哪些hive存储格式会直接转换为fs relation？哪些hive存储格式不会转换?
 Parquert 和ORC 为转换为普通文件 relation，其他的走hive metastore relation。
 下面我们测试一下 hive 存储格式为text的格式的analyzed logicplan
 ```
