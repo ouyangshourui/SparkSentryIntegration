@@ -74,7 +74,7 @@ GlobalLimit 10
 - catalog.ParquetConversions 
 - catalog.OrcConversions
 
-## 2.1 ParquetConversions
+## 2.1 ParquetConversions  
 ```
 /**
    * When scanning or writing to non-partitioned Metastore Parquet tables, convert them to Parquet
@@ -119,4 +119,6 @@ GlobalLimit 10
   }
 
 ```
+## 2.2 OrcConversions 
+和ParquertConversions类似
 
