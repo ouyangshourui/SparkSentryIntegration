@@ -1,4 +1,4 @@
-# 问题描述
+# 1、问题描述
 
 执行下面代码：
 ```
@@ -49,4 +49,74 @@ GlobalLimit 10
 - **问题1: spark 2.1.1 源码 怎么样将hive metarelation 转换为parqurt relation的？**
 - **问题2: 哪些hive存储格式会直接转换为fs relation？哪些hive存储格式不会转换?**
 
+#  2、spark 2.1.1 源码 怎么样将hive metarelation 转换为parqurt relation的？
+
+为了分析这个问题，我看可以看一下hive sql analyed  环节所有的rules
+```
+  /**
+   * An analyzer that uses the Hive metastore.
+   */
+  override lazy val analyzer: Analyzer = {
+    new Analyzer(catalog, conf) {
+      override val extendedResolutionRules =
+        catalog.ParquetConversions ::
+        catalog.OrcConversions ::
+        AnalyzeCreateTable(sparkSession) ::
+        PreprocessTableInsertion(conf) ::
+        DataSourceAnalysis(conf) ::
+        (if (conf.runSQLonFile) new ResolveDataSource(sparkSession) :: Nil else Nil)
+
+      override val extendedCheckRules = Seq(PreWriteCheck(conf, catalog))
+    }
+  }
+```
+可以重点关注：
+- catalog.ParquetConversions 
+- catalog.OrcConversions
+
+## 2.1 ParquetConversions
+```
+/**
+   * When scanning or writing to non-partitioned Metastore Parquet tables, convert them to Parquet
+   * data source relations for better performance.
+   */
+  object ParquetConversions extends Rule[LogicalPlan] {
+    // 判断是否需要转换metastore 为parquet
+    private def shouldConvertMetastoreParquet(relation: MetastoreRelation): Boolean = {
+      relation.tableDesc.getSerdeClassName.toLowerCase.contains("parquet") &&
+      //主要是看relation 里面的table描述 反序列化后是否包含parquet
+       sessionState.convertMetastoreParquet
+    }
+    //  将hive metastoreRelation 转换为新的relation
+    private def convertToParquetRelation(relation: MetastoreRelation): LogicalRelation = {
+      val defaultSource = new ParquetFileFormat()
+      val fileFormatClass = classOf[ParquetFileFormat]
+
+      val mergeSchema = sessionState.convertMetastoreParquetWithSchemaMerging
+      val options = Map(ParquetOptions.MERGE_SCHEMA -> mergeSchema.toString)
+
+      convertToLogicalRelation(relation, options, defaultSource, fileFormatClass, "parquet")
+    }
+
+    override def apply(plan: LogicalPlan): LogicalPlan = {
+      if (!plan.resolved || plan.analyzed) {
+        return plan
+      }
+
+      plan transformUp {
+        // Write path 写数据路径
+        case InsertIntoTable(r: MetastoreRelation, partition, child, overwrite, ifNotExists)
+          // Inserting into partitioned table is not supported in Parquet data source (yet).
+          if !r.hiveQlTable.isPartitioned && shouldConvertMetastoreParquet(r) =>
+          InsertIntoTable(convertToParquetRelation(r), partition, child, overwrite, ifNotExists)
+
+        // Read path 读数据路径
+        case relation: MetastoreRelation if shouldConvertMetastoreParquet(relation) =>
+          val parquetRelation = convertToParquetRelation(relation)
+          SubqueryAlias(relation.tableName, parquetRelation, None)
+      }
+    }
+  }
+
+```
 
