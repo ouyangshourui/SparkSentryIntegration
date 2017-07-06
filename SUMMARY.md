@@ -4,7 +4,7 @@
 * [File](file.md)
 * [JavaReflection](JavaReflection.md)
 * [Spark_Read_HiveMetastore](Spark_Read_HiveMetastore.md)
-* [[Spark_Read_HiveMetastore](Spark_Read_HiveMetastore.md)](parquet_relation.md)
+* [parquet_relation](parquet_relation.md)
 
 
 
