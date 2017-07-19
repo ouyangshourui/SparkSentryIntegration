@@ -1,4 +1,4 @@
-###  1、HiveExternalCatalog 是使用hive的catalog的的一个实现，需要测试一下spark2.1.0 是否使用该方法
+ #### 1、HiveExternalCatalog 是使用hive的catalog的的一个实现，需要测试一下spark2.1.0 是否使用该方法
 
 ###  2、 HiveSharedState 的确是用了hive  external catalog 
     代码如下：
