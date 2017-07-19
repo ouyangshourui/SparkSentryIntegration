@@ -2,7 +2,7 @@
 
 ###  2、 HiveSharedState 的确是用了hive  external catalog 
     代码如下：
-    override lazy val externalCatalog = new HiveExternalCatalog(metadataHive,          sparkContext.hadoopConfiguration)
+    override lazy val externalCatalog = new HiveExternalCatalog(metadataHive,sparkContext.hadoopConfiguration)
  所有session是用同一个session。
  ```
 /**
