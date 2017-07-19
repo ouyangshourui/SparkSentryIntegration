@@ -57,41 +57,24 @@ override def listDatabases(): Seq[String] = withClient {
     
 #### 7、hive.sentry.subject.name 的作用？这个参数是怎么传递过去的？
 调试代码的时候发现，spark调用hive的时候，没有将hive.sentry.subject.name 传递过去，导致下面问题
-SentryHiveMetaStoreClient 类下面两个类返回异常：
+SentryMetaStoreFilterHook 类下面两个类返回异常：
 ```
 /**
-   * Invoke Hive database filtering that removes the entries which use has no
-   * privileges to access
-   * 
-   * @param dbList
-   * @return
-   * @throws MetaException
-   */
-  private List<String> filterDatabases(List<String> dbList)
-      throws MetaException {
-    try {
-      return HiveAuthzBindingHook.filterShowDatabases(getHiveAuthzBinding(),
-          dbList, HiveOperation.SHOWDATABASES, getUserName());
-    } catch (SemanticException e) {
-      throw new MetaException("Error getting DB list " + e.getMessage());
-    }
-  }
-
-  /**
    * Invoke Hive table filtering that removes the entries which use has no
    * privileges to access
-   * 
-   * @param dbList
+   * @param tabList
    * @return
    * @throws MetaException
    */
-  private List<String> filterTables(String dbName, List<String> tabList)
-      throws MetaException {
+  private List<String> filterTab(String dbName, List<String> tabList) {
     try {
       return HiveAuthzBindingHook.filterShowTables(getHiveAuthzBinding(),
           tabList, HiveOperation.SHOWTABLES, getUserName(), dbName);
-    } catch (SemanticException e) {
-      throw new MetaException("Error getting Table list " + e.getMessage());
+    } catch (Exception e) {
+      LOG.warn("Error getting Table list ", e);
+      return new ArrayList<String>();
+    } finally {
+      close();
     }
   }
 
