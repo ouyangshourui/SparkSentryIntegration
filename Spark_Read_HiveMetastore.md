@@ -54,7 +54,20 @@ override def listDatabases(): Seq[String] = withClient {
 ### 6、 现在需要把HiveAuthzBinding 调试通，如果没有记错的话是 hive session 没有共享 
 
     使用HiveAuthzBinding 既可以
-
+    
+### 7、hive.sentry.subject.name 的作用？这个参数是怎么传递过去的？
+可以在HiveAuthzBindingSessionHook.java 中发现
+```
+ // set user name
+    sessionConf.set(HiveAuthzConf.HIVE_SENTRY_SUBJECT_NAME, sessionHookContext.getSessionUser());
+```
+上面这个类是hivesession的钩子，主要是在hiveserver2 使用的，在spark 调用hive的的时候没有使用该类，我们查看cdh hiverserver的配置参数
+```
+<property>
+    <name>hive.server2.session.hook</name>
+    <value>org.apache.sentry.binding.hive.HiveAuthzBindingSessionHook</value>
+  </property>
+```
 
 
 ### hook 资料：http://dharmeshkakadia.github.io/hive-hook/
