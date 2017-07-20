@@ -113,7 +113,7 @@ HiveSessionImpl
       LOG.warn("Error setting scheduler queue: " + e, e);
     }
 ```
-　#### 9、 怎么在spark 里面根据subject name 和 fair-site.xml 文件获取需要对应的queue name
+#### 9、怎么在spark 里面根据subject name 和 fair-site.xml 文件获取需要对应的queue name
  
  ```
  Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_60)
