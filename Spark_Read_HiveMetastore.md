@@ -98,11 +98,10 @@ SentryMetaStoreFilterHook 类下面两个类返回异常：
   </property>
 ```
 
-#### submit app to a designated yarn queue  inspark thrift-server 
+#### 8、submit app to a designated yarn queue  inspark thrift-server 
 
 HiveSessionImpl
 ```
-
     try {
       // In non-impersonation mode, map scheduler queue to current user
       // if fair scheduler is configured.
@@ -114,7 +113,39 @@ HiveSessionImpl
       LOG.warn("Error setting scheduler queue: " + e, e);
     }
 ```
+　#### 9、 怎么在spark 里面根据subject name 和 fair-site.xml 文件获取需要对应的queue name
+ 
+ ```
+ Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_60)
+Type in expressions to have them evaluated.
+Type :help for more information.
 
+scala> val ShimLoaderClass = Class.forName("org.apache.hadoop.hive.shims.ShimLoader")
+ShimLoaderClass: Class[_] = class org.apache.hadoop.hive.shims.ShimLoader
+
+scala>       val getHadoopShimsMethod = ShimLoaderClass.getMethod("getHadoopShims")
+getHadoopShimsMethod: java.lang.reflect.Method = public static synchronized org.apache.hadoop.hive.shims.HadoopShims org.apache.hadoop.hive.shims.ShimLoader.getHadoopShims()
+
+scala>       val hadoopShims = getHadoopShimsMethod.invoke(null)
+hadoopShims: Object = org.apache.hadoop.hive.shims.Hadoop23Shims@64b0ec4a
+
+scala>       val stringclass = Class.forName("java.lang.String")
+stringclass: Class[_] = class java.lang.String
+
+scala>       val confclass = Class.forName("org.apache.hadoop.conf.Configuration")
+confclass: Class[_] = class org.apache.hadoop.conf.Configuration
+
+scala>       val refreshDefaultQueueMethod = hadoopShims.getClass.
+     |         getMethod("refreshDefaultQueue", confclass, stringclass)
+refreshDefaultQueueMethod: java.lang.reflect.Method = public void org.apache.hadoop.hive.shims.Hadoop23Shims.refreshDefaultQueue(org.apache.hadoop.conf.Configuration,java.lang.String) throws java.io.IOException
+
+scala>       refreshDefaultQueueMethod.invoke(hadoopShims, sc.hadoopConfiguration , System.getProperty("hive.sentry.subject.name"))
+res0: Object = null
+
+scala> sc.hadoopConfiguration.get("mapreduce.job.queuename")
+res1: String = root.idc_analysis_group
+
+ ```
 
 
 #### hook 资料：http://dharmeshkakadia.github.io/hive-hook/
