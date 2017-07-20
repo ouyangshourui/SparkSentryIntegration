@@ -98,5 +98,23 @@ SentryMetaStoreFilterHook 类下面两个类返回异常：
   </property>
 ```
 
+#### submit app to a designated yarn queue  inspark thrift-server 
+
+HiveSessionImpl
+```
+
+    try {
+      // In non-impersonation mode, map scheduler queue to current user
+      // if fair scheduler is configured.
+      if (! hiveConf.getBoolVar(ConfVars.HIVE_SERVER2_ENABLE_DOAS) &&
+        hiveConf.getBoolVar(ConfVars.HIVE_SERVER2_MAP_FAIR_SCHEDULER_QUEUE)) {
+        ShimLoader.getHadoopShims().refreshDefaultQueue(hiveConf, username);
+      }
+    } catch (IOException e) {
+      LOG.warn("Error setting scheduler queue: " + e, e);
+    }
+```
+
+
 
 #### hook 资料：http://dharmeshkakadia.github.io/hive-hook/
