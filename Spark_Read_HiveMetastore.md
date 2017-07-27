@@ -149,3 +149,25 @@ res1: String = root.idc_analysis_group
 
 
 #### hook 资料：http://dharmeshkakadia.github.io/hive-hook/
+
+
+
+####   logical plan  Rule  出现了最大迭代次数 
+```
+17/07/27 15:16:58 WARN HiveSessionState$$anon$1: Max iterations (100) reached for batch Resolution
+17/07/27 15:16:58 INFO TableScanOperator: 0 finished. closing... 
+17/07/27 15:16:58 INFO SelectOperator: 1 finished. closing... 
+17/07/27 15:16:58 INFO LimitOperator: 2 finished. closing... 
+17/07/27 15:16:58 INFO ListSinkOperator: 4 finished. closing... 
+17/07/27 15:16:58 INFO ListSinkOperator: 4 Close done
+17/07/27 15:16:58 INFO LimitOperator: 2 Close done
+17/07/27 15:16:58 INFO SelectOperator: 1 Close done
+17/07/27 15:16:58 INFO TableScanOperator: 0 Close done
+17/07/27 15:16:58 INFO PerfLogger: <PERFLOG method=releaseLocks from=org.apache.hadoop.hive.ql.Driver>
+17/07/27 15:16:58 INFO PerfLogger: </PERFLOG method=releaseLocks start=1501139818497 end=1501139818497 duration=0 from=org.apache.hadoop.hive.ql.Driver>
+17/07/27 15:16:58 INFO HiveMetastoreCatalog$SentryPermissionCheck: SentryPermissionCheck select  table
+17/07/27 15:16:58 INFO HiveClientImpl: Running hiveql 'select * from idc_infrastructure_db.spark_table_test1 limit 1'
+17/07/27 15:16:58 INFO HiveClientImpl: *********** runHiveCompile hive.sentry.subject.name:ourui
+```
+
+
