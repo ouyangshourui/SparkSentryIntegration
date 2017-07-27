@@ -205,8 +205,8 @@ lazy val batches: Seq[Batch] = Seq(
       TimeWindowing ::
       ResolveInlineTables ::
       TypeCoercion.typeCoercionRules ++
-      extendedResolutionRules : _*),
-    Batch("Nondeterministic", Once,
+      extendedResolutionRules : _*),  // 这是一个bug，可以提交给社区
+      Batch("Nondeterministic", Once,
       PullOutNondeterministic),
     Batch("UDF", Once,
       HandleNullInputsForUDF),
