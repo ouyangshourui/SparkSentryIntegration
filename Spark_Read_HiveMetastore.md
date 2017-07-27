@@ -171,3 +171,50 @@ res1: String = root.idc_analysis_group
 ```
 
 
+下面代码
+```
+lazy val batches: Seq[Batch] = Seq(
+    Batch("Substitution", fixedPoint,
+      CTESubstitution,
+      WindowsSubstitution,
+      EliminateUnions,
+      new SubstituteUnresolvedOrdinals(conf)),
+    Batch("Resolution", **fixedPoint**,  // 默认值是100，导致额外添加的规则需要允许100次
+      ResolveTableValuedFunctions ::
+      ResolveRelations ::
+      ResolveReferences ::
+      ResolveCreateNamedStruct ::
+      ResolveDeserializer ::
+      ResolveNewInstance ::
+      ResolveUpCast ::
+      ResolveGroupingAnalytics ::
+      ResolvePivot ::
+      ResolveOrdinalInOrderByAndGroupBy ::
+      ResolveMissingReferences ::
+      ExtractGenerator ::
+      ResolveGenerate ::
+      ResolveFunctions ::
+      ResolveAliases ::
+      ResolveSubquery ::
+      ResolveWindowOrder ::
+      ResolveWindowFrame ::
+      ResolveNaturalAndUsingJoin ::
+      ExtractWindowExpressions ::
+      GlobalAggregates ::
+      ResolveAggregateFunctions ::
+      TimeWindowing ::
+      ResolveInlineTables ::
+      TypeCoercion.typeCoercionRules ++
+      extendedResolutionRules : _*),
+    Batch("Nondeterministic", Once,
+      PullOutNondeterministic),
+    Batch("UDF", Once,
+      HandleNullInputsForUDF),
+    Batch("FixNullability", Once,
+      FixNullability),
+    Batch("Cleanup", fixedPoint,
+      CleanupAliases)
+  )
+```
+
+
