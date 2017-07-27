@@ -17,4 +17,4 @@ bin/spark-submit --class com.wanda.sentry.test.TestOnYarnOld --queue root.idc_an
 # 2、save as rdd 到 使用 sentry url 权限问题
 
 
-# basic  test
+# 3、basic  test
