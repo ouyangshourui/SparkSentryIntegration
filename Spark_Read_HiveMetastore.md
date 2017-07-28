@@ -279,3 +279,6 @@ org.apache.spark.sql.AnalysisException: Table `idc_infrastructure_db`.`spark_tab
   at org.apache.spark.sql.DataFrameWriter.saveAsTable(DataFrameWriter.scala:358)
   ... 48 elided
 ```
+需要解决的两个问题
+-  禁止自动创建表和删除表
+-  save as table 权限检查
