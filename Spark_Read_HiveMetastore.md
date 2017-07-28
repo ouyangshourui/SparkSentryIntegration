@@ -152,7 +152,7 @@ res1: String = root.idc_analysis_group
 
 
 
-####   logical plan  Rule  出现了最大迭代次数 
+#### 10、  logical plan  Rule  出现了最大迭代次数 
 ```
 17/07/27 15:16:58 WARN HiveSessionState$$anon$1: Max iterations (100) reached for batch Resolution
 17/07/27 15:16:58 INFO TableScanOperator: 0 finished. closing... 
@@ -217,4 +217,65 @@ lazy val batches: Seq[Batch] = Seq(
   )
 ```
 
+使用了map记住已经检查的权限
+```
+  /**
+    * when spark with sentry, we nend to check premission
+    */
+  object SentryPermissionCheck extends Rule[LogicalPlan] {
+    // avoid multi check read and write permission
+    var priMap = new java.util.HashMap[String, Boolean]
+    val hiveclient = sparkSession.sharedState.externalCatalog
+      .asInstanceOf[HiveExternalCatalog].client
+    val sentryEabled = sparkSession.sharedState.sparkContext.conf
+                       .get("spark.sentry.enabled", "false").toBoolean
 
+    override def apply(plan: LogicalPlan): LogicalPlan = {
+      if (!plan.resolved || plan.analyzed) {
+        return plan
+      }
+      plan transformUp {
+        // Write path
+        case InsertIntoTable(r: MetastoreRelation, partition, child, overwrite, ifNotExists)
+          if (sentryEabled) =>
+          val tablename = r.databaseName + "." + r.tableName
+          val sql = String.format("insert overwrite table %s select * from %s limit 1"
+            , tablename, tablename)
+          val v = tablename + "InsertIntoTable"
+          if (this.priMap.containsKey(v) && this.priMap.get(v)) {
+            InsertIntoTable(r, partition, child, overwrite, ifNotExists)
+          } else {
+            logInfo("SentryPermissionCheck InsertIntoTable")
+            this.priMap.put(v, this.hiveclient.runHiveCompile(sql))
+            InsertIntoTable(r, partition, child, overwrite, ifNotExists)
+          }
+
+        // Read path
+        case relation: MetastoreRelation  if (sentryEabled) =>
+          val tablename = relation.databaseName + "." + relation.tableName
+          val v = tablename + "read path"
+          val sql = String.format("select * from %s limit 1", tablename)
+          if (this.priMap.containsKey(v) && this.priMap.get(v)) {
+            SubqueryAlias(relation.tableName, relation, None)
+          } else {
+            logInfo("SentryPermissionCheck read table")
+            this.priMap.put(v, this.hiveclient.runHiveCompile(sql))
+            SubqueryAlias(relation.tableName, relation, None)
+          }
+      }
+    }
+  }
+```
+
+#### 11、dataset as table问题
+```
+scala> val ds =  spark.sql("select * from idc_infrastructure_db.spark_table_test1")
+17/07/28 09:26:12 WARN HiveSessionState$$anon$1: Max iterations (100) reached for batch Resolution
+ds: org.apache.spark.sql.DataFrame = [id: string, name: string]
+
+scala>     ds.write.saveAsTable("idc_infrastructure_db.spark_table_test3")
+org.apache.spark.sql.AnalysisException: Table `idc_infrastructure_db`.`spark_table_test3` already exists.;
+  at org.apache.spark.sql.DataFrameWriter.saveAsTable(DataFrameWriter.scala:373)
+  at org.apache.spark.sql.DataFrameWriter.saveAsTable(DataFrameWriter.scala:358)
+  ... 48 elided
+```
