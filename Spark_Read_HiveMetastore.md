@@ -281,4 +281,75 @@ org.apache.spark.sql.AnalysisException: Table `idc_infrastructure_db`.`spark_tab
 ```
 需要解决的两个问题
 -  禁止自动创建表和删除表
+```
+override def createDatabase(
+      database: CatalogDatabase,
+      ignoreIfExists: Boolean): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,createDatabase is forbidden,please use hive beeline ")
+      throw new Exception("createDatabase is forbidden")
+    }
+      client.createDatabase(
+      new HiveDatabase(
+        database.name,
+        database.description,
+        database.locationUri,
+        Option(database.properties).map(_.asJava).orNull),
+        ignoreIfExists)
+  }
+
+  override def dropDatabase(
+      name: String,
+      ignoreIfNotExists: Boolean,
+      cascade: Boolean): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,dropDatabase is forbidden,please use hive beeline ")
+      throw new Exception("dropDatabase is forbidden")
+    }
+    client.dropDatabase(name, true, ignoreIfNotExists, cascade)
+  }
+
+  override def alterDatabase(database: CatalogDatabase): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,alterDatabase is forbidden,please use hive beeline ")
+      throw new Exception("alterDatabase is forbidden")
+    }
+    client.alterDatabase(
+      database.name,
+      new HiveDatabase(
+        database.name,
+        database.description,
+        database.locationUri,
+        Option(database.properties).map(_.asJava).orNull))
+  }
+  override def createTable(table: CatalogTable, ignoreIfExists: Boolean): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,createTable is forbidden,please use hive beeline ")
+      throw new Exception("createTable is forbidden")
+    }
+    client.createTable(toHiveTable(table), ignoreIfExists)
+  }
+
+  override def dropTable(
+      dbName: String,
+      tableName: String,
+      ignoreIfNotExists: Boolean,
+      purge: Boolean): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,dropTable is forbidden,please use hive beeline ")
+      throw new Exception("dropTable is forbidden")
+    }
+    shim.dropTable(client, dbName, tableName, true, ignoreIfNotExists, purge)
+  }
+
+  override def alterTable(tableName: String, table: CatalogTable): Unit = withHiveState {
+    if (sparkConf.get("spark.sentry.enabled", "false").toBoolean) {
+      logInfo("spark.sentry.enabled enabled ,alterTable is forbidden,please use hive beeline ")
+      throw new Exception("alterTable is forbidden")
+    }
+    val hiveTable = toHiveTable(table)
+    // Do not use `table.qualifiedName` here because this may be a rename
+    val qualifiedTableName = s"${table.database}.$tableName"
+  
+```
 -  save as table 权限检查
