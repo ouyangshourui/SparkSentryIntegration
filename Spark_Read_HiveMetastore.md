@@ -353,3 +353,5 @@ override def createDatabase(
   
 ```
 -  save as table 权限检查
+  已经解决，只能给insertInto
+
