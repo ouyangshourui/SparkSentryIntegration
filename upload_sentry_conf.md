@@ -158,3 +158,31 @@ need to change code
 ./sql/hive-thriftserver/src/main/scala/org/apache/spark/sql/hive/thriftserver/SparkSQLCLIDriver.scala:    cliConf.set("hive.sentry.subject.name", System.getProperty( "hive.sentry.subject.name" ))
 ./yarn/src/main/scala/org/apache/spark/deploy/yarn/security/HiveCredentialProvider.scala:        hadoopConf.set("hive.sentry.subject.name", System.getProperty( "hive.sentry.subject.name" ))
 ```
+
+## HiveClientImpl
+```
+        val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
+        val url = Thread.currentThread.getContextClassLoader.getResource(sentryconf)
+        hiveConf.set("hive.sentry.conf.url", url.toString)
+        val uname = System.getProperty( "hive.sentry.subject.name" )
+        hiveConf.set("hive.sentry.subject.name", uname)
+        val state = new SessionState(hiveConf,uname)
+```
+## HiveCredentialProvider
+```
+  val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
+        val url = Thread.currentThread.getContextClassLoader.getResource(sentryconf)
+        hadoopConf.set("hive.sentry.conf.url", url.toString)
+        hadoopConf.set("hive.sentry.subject.name", System.getProperty( "hive.sentry.subject.name" ))
+        val conf = hiveConf(hadoopConf)
+        val sessionClass = mirror.classLoader.loadClass("org.apache.hadoop.hive.ql.session.SessionState")
+        val startMethod = sessionClass.getMethod("start", hiveConfClass)
+        startMethod.invoke(null, conf)
+        val hive = getHive.invoke(null, conf)
+        val tokenStr = getDelegationToken.invoke(hive, currentUser.getUserName(), principal)
+          .asInstanceOf[String]
+        val hive2Token = new Token[DelegationTokenIdentifier]()
+        hive2Token.decodeFromUrlString(tokenStr)
+        logInfo(s"Get Token from hive metastore: ${hive2Token.toString}")
+        creds.addToken(new Text("hive.server2.delegation.token"), hive2Token)
+```
