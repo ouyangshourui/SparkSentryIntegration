@@ -143,3 +143,9 @@ val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
       hadoopConfFiles(prop) = new File(url.getPath)
     }
 ```
+
+# 5、dynamic change hive.sentry.conf.url 
+```
+ val url = Thread.currentThread.getContextClassLoader.getResource("sentry-site.xml")
+ hadoopConf.set("hive.sentry.conf.url", url.toString)
+```
