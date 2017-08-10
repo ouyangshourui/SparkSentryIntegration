@@ -92,3 +92,54 @@
 -  放到"HADOOP_CONF_DIR", "YARN_CONF_DIR"目录下面，缺点是会，spark自己维护这个目录
 -  放到spark/conf下面，和"log4j.properties", "metrics.properties"一起上传
 
+# 3、查看log
+```
+17/08/10 11:03:12 INFO Client: Uploading resource file:/tmp/spark-e8bb2881-32be-4b44-ae2b-490f8fe3d0ea/__spark_libs__6647694787133880357.zip -> hdfs://nameservice1/user/ganjianling/.sparkStaging/application_1501815942564_0032/__spark_libs__6647694787133880357.zip
+17/08/10 11:03:14 INFO Client: Uploading resource file:/tmp/spark-e8bb2881-32be-4b44-ae2b-490f8fe3d0ea/__spark_conf__3963391366986834898.zip -> hdfs://nameservice1/user/ganjianling/.sparkStaging/application_1501815942564_0032/__spark_conf__.zip
+17/08/10 11:03:14 INFO SecurityManager: Changing view acls to: root,ganjianling
+17/08/10 11:03:14 INFO SecurityManager: Changing modify acls to: root,ganjianling
+17/08/10 11:03:14 INFO SecurityManager: Changing view acls groups to: 
+17/08/10 11:03:14 INFO SecurityManager: Changing modify acls groups to: 
+17/08/10 11:03:14 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(root, ganjianling); groups with view permissions: Set(); users  with modify permissions: Set(root, ganjianling); groups with modify permissions: Set()
+17/08/10 11:03:14 INFO Client: Submitting application application_1501815942564_0032 to ResourceManager
+17/08/10 11:03:14 INFO YarnClientImpl: Submitted application application_1501815942564_0032
+17/08/10 11:03:14 INFO SchedulerExtensionServices: Starting Yarn extension services with app application_1501815942564_0032 and attemptId None
+17/08/10 11:03:15 INFO Client: Application report for application_1501815942564_0032 (state: ACCEPTED)
+17/08/10 11:03:15 INFO Client: 
+         client token: Token { kind: YARN_CLIENT_TOKEN, service:  }
+         diagnostics: N/A
+         ApplicationMaster host: N/A
+         ApplicationMaster RPC port: -1
+         queue: root.credit_analysis_group
+         start time: 1502334194639
+```
+**unzip file :file:/tmp/spark-e8bb2881-32be-4b44-ae2b-490f8fe3d0ea/__spark_conf__3963391366986834898.zip**
+```
+[root@lpsllfdrcw1 spark-e8bb2881-32be-4b44-ae2b-490f8fe3d0ea]# unzip __spark_conf__3963391366986834898.zip
+Archive:  __spark_conf__3963391366986834898.zip
+replace mapred-site.xml? [y]es, [n]o, [A]ll, [N]one, [r]ename: A
+  inflating: mapred-site.xml         
+  inflating: hadoop-env.sh           
+  inflating: core-site.xml           
+  inflating: yarn-site.xml           
+  inflating: topology.map            
+  inflating: ssl-client.xml          
+  inflating: hdfs-site.xml           
+  inflating: sentry-site.xml         
+  inflating: topology.py             
+  inflating: __spark_conf__.properties  
+[root@lpsllfdrcw1 spark-e8bb2881-32be-4b44-ae2b-490f8fe3d0ea]# 
+```
+
+sentry-site.xml location is spark/conf, now can upload to cluster
+
+
+4、 code
+```
+val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
+    for { prop <- Seq("log4j.properties", "metrics.properties", sentryconf)
+          url <- Option(Utils.getContextOrSparkClassLoader.getResource(prop))
+          if url.getProtocol == "file" } {
+      hadoopConfFiles(prop) = new File(url.getPath)
+    }
+```
