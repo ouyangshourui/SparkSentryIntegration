@@ -149,3 +149,12 @@ val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
  val url = Thread.currentThread.getContextClassLoader.getResource("sentry-site.xml")
  hadoopConf.set("hive.sentry.conf.url", url.toString)
 ```
+need to change code
+```
+[root@cdndc-213128087 spark-2.1.1]# grep -r 'hive.sentry.subject.name'  ./* 
+./core/src/main/scala/org/apache/spark/deploy/SparkSubmit.scala:    System.setProperty("hive.sentry.subject.name", UserGroupInformation.getCurrentUser().getShortUserName)
+./sql/hive/src/main/scala/org/apache/spark/sql/hive/client/HiveClientImpl.scala:        val uname = System.getProperty( "hive.sentry.subject.name" )
+./sql/hive/src/main/scala/org/apache/spark/sql/hive/client/HiveClientImpl.scala:        hiveConf.set("hive.sentry.subject.name", uname)
+./sql/hive-thriftserver/src/main/scala/org/apache/spark/sql/hive/thriftserver/SparkSQLCLIDriver.scala:    cliConf.set("hive.sentry.subject.name", System.getProperty( "hive.sentry.subject.name" ))
+./yarn/src/main/scala/org/apache/spark/deploy/yarn/security/HiveCredentialProvider.scala:        hadoopConf.set("hive.sentry.subject.name", System.getProperty( "hive.sentry.subject.name" ))
+```
