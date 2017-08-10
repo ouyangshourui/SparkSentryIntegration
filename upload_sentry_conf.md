@@ -134,7 +134,7 @@ replace mapred-site.xml? [y]es, [n]o, [A]ll, [N]one, [r]ename: A
 sentry-site.xml location is spark/conf, now can upload to cluster
 
 
-4、 code
+# 4、 code
 ```
 val sentryconf = sparkConf.get("spark.sentry.conf.name", "sentry-site.xml")
     for { prop <- Seq("log4j.properties", "metrics.properties", sentryconf)
