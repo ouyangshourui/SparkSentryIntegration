@@ -83,8 +83,7 @@ sbin/start-thriftserver.sh  --master yarn \
  --hiveconf hive.server2.authentication.ldap.baseDN="ou=People,dc=IDC,dc=WANDA-GROUP,dc=NET" \
 --hiveconf hive.server2.authentication.kerberos.principal="hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET" \
  --hiveconf hive.server2.authentication.kerberos.keytab="/root/spark/spark/conf/hive_lpsllfdrcw1.keytab" 
-#bin/beeline -u jdbc:hive2://lpsllfdrcw1.lfidcwanda.cn:10081 -n  ganjianling  -p 123456  -d org.apache.hive.jdbc.HiveDriver        
-        
+#bin/beeline -u jdbc:hive2://lpsllfdrcw1.lfidcwanda.cn:10081 -n  ganjianling  -p 123456  -d org.apache.hive.jdbc.HiveDriver        
 ```
-# 
+# 没有以单独用户执行
 #
