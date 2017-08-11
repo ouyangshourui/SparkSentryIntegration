@@ -51,6 +51,10 @@ Caused by: java.lang.ClassNotFoundException: org.apache.hadoop.yarn.server.resou
         at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
         ... 20 more
 ```
+resove method:
+```
+cp /opt/cloudera/parcels/CDH/jars/hadoop-yarn-server-resourcemanager-2.6.0-cdh5.7.1.jar  jars/
+```
 # 
 # 
 #
