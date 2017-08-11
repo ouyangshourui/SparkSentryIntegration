@@ -9,6 +9,7 @@ Connecting to jdbc:hive2://lpsllfdrcw1.lfidcwanda.cn:10083/;principal=hive/lpsll
 Error: Could not load shims in class org.apache.hadoop.hive.schshim.FairSchedulerShim (state=,code=0)
 Beeline version 1.2.1.spark2 by Apache Hive
 ```
+cp /opt/cloudera/parcels/CDH/jars/hive-shims-scheduler-1.1.0-cdh5.7.1.jar  jars/ 
 # 
 # 
 #
