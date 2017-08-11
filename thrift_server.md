@@ -86,4 +86,98 @@ sbin/start-thriftserver.sh  --master yarn \
 #bin/beeline -u jdbc:hive2://lpsllfdrcw1.lfidcwanda.cn:10081 -n  ganjianling  -p 123456  -d org.apache.hive.jdbc.HiveDriver        
 ```
 # 没有以单独用户执行
-#
+
+
+#User impersonation in Apache Spark 1.6 Thrift Server
+
+https://community.hortonworks.com/articles/101418/user-impersonation-in-apache-spark-16-thrift-serve.html
+```
+org.apache.hadoop.hive.ql.parse.SemanticException: org.apache.sentry.binding.hive.conf.InvalidConfigurationException: hive.server2.enable.doAs can't be set to true in non-testing mode
+        at org.apache.sentry.binding.hive.HiveAuthzBindingHook.getHiveBindingWithPrivilegeCache(HiveAuthzBindingHook.java:978)
+        at org.apache.sentry.binding.hive.HiveAuthzBindingHook.filterShowDatabases(HiveAuthzBindingHook.java:836)
+        at org.apache.sentry.binding.metastore.SentryMetaStoreFilterHook.filterDb(SentryMetaStoreFilterHook.java:131)
+        at org.apache.sentry.binding.metastore.SentryMetaStoreFilterHook.filterDatabases(SentryMetaStoreFilterHook.java:59)
+        at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.getAllDatabases(HiveMetaStoreClient.java:1031)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.invoke(RetryingMetaStoreClient.java:156)
+        at com.sun.proxy.$Proxy24.getAllDatabases(Unknown Source)
+        at org.apache.hadoop.hive.ql.metadata.Hive.getAllDatabases(Hive.java:1234)
+        at org.apache.hadoop.hive.ql.metadata.Hive.reloadFunctions(Hive.java:174)
+org.apache.hadoop.hive.ql.parse.SemanticException: org.apache.sentry.binding.hive.conf.InvalidConfigurationException: hive.server2.enable.
+doAs can't be set to true in non-testing mode
+17/08/11 14:12:09 ERROR HiveAuthzBindingHook: Can not create HiveAuthzBinding with privilege cache.
+17/08/11 14:12:09 WARN SentryMetaStoreFilterHook: Error getting DB list 
+org.apache.hadoop.hive.ql.parse.SemanticException: org.apache.sentry.binding.hive.conf.InvalidConfigurationException: hive.server2.enable.
+doAs can't be set to true in non-testing mode
+        at org.apache.sentry.binding.hive.HiveAuthzBindingHook.getHiveBindingWithPrivilegeCache(HiveAuthzBindingHook.java:978)
+        at org.apache.sentry.binding.hive.HiveAuthzBindingHook.filterShowDatabases(HiveAuthzBindingHook.java:836)
+        at org.apache.sentry.binding.metastore.SentryMetaStoreFilterHook.filterDb(SentryMetaStoreFilterHook.java:131)
+        at org.apache.sentry.binding.metastore.SentryMetaStoreFilterHook.filterDatabases(SentryMetaStoreFilterHook.java:59)
+        at org.apache.hadoop.hive.metastore.HiveMetaStoreClient.getAllDatabases(HiveMetaStoreClient.java:1031)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at org.apache.hadoop.hive.metastore.RetryingMetaStoreClient.invoke(RetryingMetaStoreClient.java:156)
+        at com.sun.proxy.$Proxy24.getAllDatabases(Unknown Source)
+        at org.apache.hadoop.hive.ql.metadata.Hive.getAllDatabases(Hive.java:1234)
+        at org.apache.hadoop.hive.ql.metadata.Hive.reloadFunctions(Hive.java:174)
+        at org.apache.hadoop.hive.ql.metadata.Hive.<clinit>(Hive.java:166)
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:503)
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:466)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider$$anonfun$obtainCredentials$1.apply$mcV$sp(HiveCredentialProvider.scala:98)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider$$anonfun$obtainCredentials$1.apply(HiveCredentialProvider.scala:90)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider$$anonfun$obtainCredentials$1.apply(HiveCredentialProvider.scala:90)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider$$anon$1.run(HiveCredentialProvider.scala:131)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at javax.security.auth.Subject.doAs(Subject.java:422)
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1693)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider.doAsRealUser(HiveCredentialProvider.scala:130)
+        at org.apache.spark.deploy.yarn.security.HiveCredentialProvider.obtainCredentials(HiveCredentialProvider.scala:90)
+        at org.apache.spark.deploy.yarn.security.ConfigurableCredentialManager$$anonfun$obtainCredentials$2.apply(ConfigurableCredentialManager.scala:82)
+        at org.apache.spark.deploy.yarn.security.ConfigurableCredentialManager$$anonfun$obtainCredentials$2.apply(ConfigurableCredentialManager.scala:80)
+        at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)
+        at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)
+        at scala.collection.Iterator$class.foreach(Iterator.scala:893)
+        at scala.collection.AbstractIterator.foreach(Iterator.scala:1336)
+        at scala.collection.MapLike$DefaultValuesIterable.foreach(MapLike.scala:206)
+        at scala.collection.TraversableLike$class.flatMap(TraversableLike.scala:241)
+        at scala.collection.AbstractTraversable.flatMap(Traversable.scala:104)
+        at org.apache.spark.deploy.yarn.security.ConfigurableCredentialManager.obtainCredentials(ConfigurableCredentialManager.scala:80)
+        at org.apache.spark.deploy.yarn.Client.prepareLocalResources(Client.scala:403)
+        at org.apache.spark.deploy.yarn.Client.createContainerLaunchContext(Client.scala:885)
+        at org.apache.spark.deploy.yarn.Client.submitApplication(Client.scala:171)
+        at org.apache.spark.scheduler.cluster.YarnClientSchedulerBackend.start(YarnClientSchedulerBackend.scala:56)
+        at org.apache.spark.scheduler.TaskSchedulerImpl.start(TaskSchedulerImpl.scala:156)
+        at org.apache.spark.SparkContext.<init>(SparkContext.scala:509)
+        at org.apache.spark.SparkContext$.getOrCreate(SparkContext.scala:2320)
+        at org.apache.spark.sql.SparkSession$Builder$$anonfun$6.apply(SparkSession.scala:868)
+        at org.apache.spark.sql.SparkSession$Builder$$anonfun$6.apply(SparkSession.scala:860)
+        at scala.Option.getOrElse(Option.scala:121)
+        at org.apache.spark.sql.SparkSession$Builder.getOrCreate(SparkSession.scala:860)
+        at org.apache.spark.sql.hive.thriftserver.SparkSQLEnv$.init(SparkSQLEnv.scala:47)
+        at org.apache.spark.sql.hive.thriftserver.HiveThriftServer2$.main(HiveThriftServer2.scala:81)
+        at org.apache.spark.sql.hive.thriftserver.HiveThriftServer2.main(HiveThriftServer2.scala)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:497)
+        at org.apache.spark.deploy.SparkSubmit$.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:744)
+        at org.apache.spark.deploy.SparkSubmit$.doRunMain$1(SparkSubmit.scala:187)
+        at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:212)
+        at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:126)
+        at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+Caused by: org.apache.sentry.binding.hive.conf.InvalidConfigurationException: hive.server2.enable.doAs can't be set to true in non-testing mode
+        at org.apache.sentry.binding.hive.authz.HiveAuthzBinding.validateHiveServer2Config(HiveAuthzBinding.java:189)
+        at org.apache.sentry.binding.hive.authz.HiveAuthzBinding.validateHiveConfig(HiveAuthzBinding.java:148)
+        at org.apache.sentry.binding.hive.authz.HiveAuthzBinding.<init>(HiveAuthzBinding.java:96)
+        at org.apache.sentry.binding.hive.HiveAuthzBindingHook.getHiveBindingWithPrivilegeCache(HiveAuthzBindingHook.java:974)
+        ... 61 more
+```
