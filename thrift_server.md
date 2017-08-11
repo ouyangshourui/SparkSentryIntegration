@@ -1,5 +1,16 @@
 # kerberos
+
 ```
+[root@lpsllfdrcw1 spark]# kinit -kt /root/spark/spark/conf/hive_lpsllfdrcw1.keytab hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET
+[root@lpsllfdrcw1 spark]# klist
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET
+
+Valid starting       Expires              Service principal
+08/11/2017 10:39:18  08/12/2017 10:39:18  krbtgt/LFDC.WANDA-GROUP.NET@LFDC.WANDA-GROUP.NET
+        renew until 08/16/2017 10:39:18
+
+
 sbin/start-thriftserver.sh  --master yarn \
  --hiveconf hive.server2.authentication=KERBEROS \
  --hiveconf hive.server2.authentication.kerberos.principal="hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET" \
