@@ -66,6 +66,25 @@ resove method:
 ```
 cp /opt/cloudera/parcels/CDH/jars/hadoop-yarn-server-resourcemanager-2.6.0-cdh5.7.1.jar  jars/
 ```
-# 
+# ldap
+```
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET
+
+Valid starting       Expires              Service principal
+08/11/2017 10:39:18  08/12/2017 10:39:18  krbtgt/LFDC.WANDA-GROUP.NET@LFDC.WANDA-GROUP.NET
+        renew until 08/16/2017 10:39:18
+        
+        
+sbin/start-thriftserver.sh  --master yarn \
+ --hiveconf hive.server2.thrift.port=10081 \
+ --hiveconf hive.server2.authentication=LDAP \
+ --hiveconf hive.server2.authentication.ldap.url="ldap://10.199.192.48:389" \
+ --hiveconf hive.server2.authentication.ldap.baseDN="ou=People,dc=IDC,dc=WANDA-GROUP,dc=NET" \
+--hiveconf hive.server2.authentication.kerberos.principal="hive/lpsllfdrcw1.lfidcwanda.cn@LFDC.WANDA-GROUP.NET" \
+ --hiveconf hive.server2.authentication.kerberos.keytab="/root/spark/spark/conf/hive_lpsllfdrcw1.keytab" 
+#bin/beeline -u jdbc:hive2://lpsllfdrcw1.lfidcwanda.cn:10081 -n  ganjianling  -p 123456  -d org.apache.hive.jdbc.HiveDriver        
+        
+```
 # 
 #
